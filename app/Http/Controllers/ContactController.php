@@ -74,7 +74,7 @@ class ContactController extends Controller
     public function import(Request $request)
     {
         $request->validate([
-            'xml_file' => 'required|file|mimes:xml',
+            'xml_file' => 'required|file|mimetypes:text/xml,application/xml',
         ]);
 
         $xml = simplexml_load_file($request->file('xml_file'));

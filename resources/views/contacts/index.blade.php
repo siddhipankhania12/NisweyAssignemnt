@@ -48,21 +48,38 @@
     <div class="card">
         <div class="card-header bg-success text-white">Contact List</div>
         <div class="card-body">
+            <!-- Add Contact Button -->
+            <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#createContactModal">
+                ➕ Add New Contact
+            </button>
+
             <table class="table table-bordered">
                 <thead class="table-light">
                     <tr>
                         <th>#</th>
                         <th>Name</th>
                         <th>Phone</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($contacts as $contact)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                            <td>{{ $contact->name }}</td>
-                            <td>{{ $contact->phone }}</td>
-                        </tr>
+                    <tr>
+                        <td>{{ $loop->iteration }}</td>
+                        <td>{{ $contact->name }}</td>
+                        <td>{{ $contact->phone }}</td>
+                        <td>
+                            <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editModal-{{ $contact->id }}">✏️ Edit</button>
+
+                            <form method="POST" action="{{ route('contacts.destroy', $contact) }}" style="display:inline;">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger" onclick="return confirm('Delete this contact?')">🗑 Delete</button>
+                            </form>
+                        </td>
+
+                    </tr>
+
                     @empty
                         <tr>
                             <td colspan="3" class="text-center">No contacts available.</td>
@@ -70,6 +87,11 @@
                     @endforelse
                 </tbody>
             </table>
+            <!-- Pagination Links -->
+<div class="d-flex justify-content-center">
+    {{ $contacts->links() }}
+</div>
+
         </div>
     </div>
 </div>
@@ -84,6 +106,66 @@
         </div>
     </div>
 </div>
+
+<!-- Create Contact Modal -->
+<div class="modal fade" id="createContactModal" tabindex="-1" aria-labelledby="createContactModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('contacts.store') }}">
+      @csrf
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createContactModalLabel">Add New Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Add Contact</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+@foreach($contacts as $contact)
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal-{{ $contact->id }}" tabindex="-1" aria-labelledby="editModalLabel-{{ $contact->id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ route('contacts.update', $contact) }}">
+      @csrf
+      @method('PUT')
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Contact</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label>Name</label>
+            <input type="text" name="name" class="form-control" value="{{ $contact->name }}" required>
+          </div>
+          <div class="mb-3">
+            <label>Phone</label>
+            <input type="text" name="phone" class="form-control" value="{{ $contact->phone }}" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+@endforeach
+
 
 <!-- Bootstrap 5 JS & Popper.js -->
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
